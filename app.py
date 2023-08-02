@@ -1,6 +1,7 @@
 from flask import Flask, request, make_response
 import supabase
 import bcrypt
+from datetime import date, datetime
 #import re
 
 app = Flask(__name__)
@@ -26,6 +27,15 @@ def register():
     if not name_usuario.isalpha():
         return make_response({"error": "El nombre solo puede contener letras"}, 400)
     
+    today = date.today()
+    nac = datetime.strptime(birth_usuario, "%Y-%m-%d")
+    nac = nac.date()
+    age = today - nac
+    age = age.total_seconds() / (365.25 * 24 * 60 * 60)
+    age = round(age)
+    if age < 18: # Puedes cambiar este valor según el criterio que quieras aplicar
+        return make_response({"error": "El usuario debe ser mayor de edad"}, 400)
+    
     #opcion 1:
     #if not re.match(r'^\\+?\\d+$', tlfn_usuario):
     # Mostrar un mensaje de error o pedir otro número
@@ -35,6 +45,7 @@ def register():
     #if not tlfn_usuario.isdigit():
     #    return make_response({"error": "El telefono solo puede contener numeros"}, 400)
     
+
     hashed = bcrypt.hashpw(pswd_usuario.encode("utf-8"), salt)
     hashed = hashed.decode("utf-8")
 
