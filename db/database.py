@@ -6,3 +6,4 @@ key: str = os.environ.get("SUPABASE_KEY")
 supabaseConnection: Client = create_client(url, key)
 
 
+
