@@ -5,3 +5,4 @@ from api.usuarios.usuarios import usuarios
 app = Flask(__name__)
 app.register_blueprint(domain_validator)
 app.register_blueprint(usuarios)
+
