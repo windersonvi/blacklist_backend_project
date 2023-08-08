@@ -89,7 +89,7 @@ def is_valid_phone_number(phone):
 
 @usuarios.route("/login", methods=["POST"])
 def login():
-    salt = bcrypt.gensalt(10)
+    salt = bcrypt.gensalt(rounds=10)
 
     data = request.get_json()
     mail_usuario = data.get("mail_usuario")
