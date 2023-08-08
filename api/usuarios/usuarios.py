@@ -87,23 +87,4 @@ def is_valid_phone_number(phone):
     pattern = r"^[+][0-9]+$"
     return re.match(pattern, phone)
 
-@usuarios.route("/login", methods=["POST"])
-def login():
-    salt = bcrypt.gensalt(10)
-
-    data = request.get_json()
-    mail_usuario = data.get("mail_usuario")
-    pswd_usuario = data.get("pswd_usuario")
-
-    hashed = bcrypt.hashpw(pswd_usuario.encode("utf-8"), salt)
-    hashed = hashed.decode("utf-8")
-
-    search = supabaseConnection.table("usuario").select("mail_usuario","pswd_usuario").eq("mail_usuario", mail_usuario).execute()
-    if search.data:
-        if bcrypt.checkpw(pswd_usuario, search.data[0]["pswd_usuario"]):
-        #if hashed == search.data[0]["pswd_usuario"]:
-            return make_response({"success": "usuario encontrado"}, 200)
-        else: 
-            return make_response({"error": "La clave es incorrecta"}, 400)
-    else:
-        return make_response({"error": "El correo no existe"}, 400)
+    
