@@ -1,5 +1,6 @@
 from flask import Blueprint, request, make_response 
 from db.database import supabaseConnection
+from api.domain_validator.domain_validator_api import is_valid_email_format, is_valid_domain
 import bcrypt
 from datetime import date, datetime
 import re
@@ -20,8 +21,19 @@ def register():
     birth_usuario = data.get("birth_usuario")
     id_plan = data.get("id_plan")
 
+    if not is_valid_email_format(mail_usuario):
+        return make_response({"error": "El formato del correo no es válido"}, 400)
+    
+    if not is_valid_domain(mail_usuario):
+        return make_response({"error": "El dominio del correo no es válido"}, 400)
+
     if not is_valid_name(name_usuario):
         return make_response({"error": "El nombre solo puede contener letras"}, 400)
+    
+    #Validar que el correo no sea existente 
+    validmail= supabaseConnection.table("usuario").select("mail_usuario").eq("mail_usuario",mail_usuario).execute()
+    if validmail.data:
+        return make_response({"error": "El correo ya existe"}, 400)
     
     #Validar si es mayor de edad
     today = date.today()
@@ -32,16 +44,6 @@ def register():
     age = round(age)
     if age < 18:
         return make_response({"error": "El usuario debe ser mayor de edad"}, 400)
-    
-    # Validar que el correo tenga un formato válido.
-    format = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$')
-    if not format.match(mail_usuario):
-        return make_response({"error": "El formato del correo no es valido"}, 400)
-
-    #Validar que el correo no sea existente 
-    validmail= supabaseConnection.table("usuario").select("mail_usuario").eq("mail_usuario",mail_usuario).execute()
-    if validmail.data:
-        return make_response({"error": "El correo ya existe"}, 400)
 
     #Generar api key del plan free 
     if id_plan == 1:
