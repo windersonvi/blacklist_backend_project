@@ -14,6 +14,9 @@
 #### mac/linux
 `. .venv/bin/activate`
 
+### Para instalar las flask 
+`pip install Flask`
+
 ### Para instalar las dependencias 
 `pip install -r requirements`
 
